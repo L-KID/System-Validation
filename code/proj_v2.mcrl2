@@ -21,7 +21,6 @@ sort 	% Multi-Objects
 	
 
 act    %communication
-%%%%%
        r_liState,s_liState,comm_liState:State;
        r_beState,s_beState,comm_beState:State;
        r_barState,s_barState,comm_barState:barState;
@@ -48,9 +47,8 @@ proc   Light(ls:State)=(ls==OFF)-> r_safeSign(UNSAFE).a_setLight(bothL,ON).s_liS
        safeVerify(T1State:trackInfo,T2State:trackInfo)=
                    r_track1Info(T1,OCCUPIED).s_safeSign(UNSAFE).safeVerify(T1State=OCCUPIED)+
                    r_track2Info(T2,OCCUPIED).s_safeSign(UNSAFE).safeVerify(T2State=OCCUPIED)+
-                   r_track1Info(T1,CLEAR).safeVerify(T1State=CLEAR).((T2State==CLEAR)->s_safeSign(SAFE)).safeVerify(CLEAR,CLEAR)+
-                   r_track2Info(T2,CLEAR).safeVerify(T2State=CLEAR).((T1State==CLEAR)->s_safeSign(SAFE)).safeVerify(CLEAR,CLEAR);
-                   %((T1State==CLEAR)&&(T2State==CLEAR))->s_safeSign(SAFE).safeVerify(CLEAR,CLEAR);     
+                   r_track1Info(T1,CLEAR).(T2State==CLEAR)->s_safeSign(SAFE)<>safeVerify(T1State=CLEAR)+
+                   r_track2Info(T2,CLEAR).(T1State==CLEAR)->s_safeSign(SAFE)<>safeVerify(T2State=CLEAR);     
                                                          
 
        track1State(tr1:trackInfo,pos:trainPosition)=
