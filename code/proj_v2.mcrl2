@@ -21,6 +21,7 @@ sort 	% Multi-Objects
 	
 
 act    %communication
+%%%%%
        r_liState,s_liState,comm_liState:State;
        r_beState,s_beState,comm_beState:State;
        r_barState,s_barState,comm_barState:barState;
