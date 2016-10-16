@@ -15,7 +15,7 @@ sort 	% Multi-Objects
 	sensorState 	= struct DETECTED;	% Sensors
        safeSign       = struct SAFE|UNSAFE;
        
-       trainPosition  = struct ARRIVE_e|CENTRAL2w|LEAVE_w|
+       trainPosition  = struct None|ARRIVE_e|CENTRAL2w|LEAVE_w|
                               ARRIVE_w|CENTRAL2e|LEAVE_e;
        trackInfo      = struct CLEAR|OCCUPIED;
 	
@@ -135,11 +135,11 @@ proc   Light(ls:State)=(ls==OFF)-> r_safeSign(UNSAFE).a_setLight(bothL,ON).s_liS
 
 init   allow ({comm_liState,comm_beState,comm_barState,comm_safeSign,comm_track1Info,comm_track2Info,
                a_setLight,a_setBell,a_setBarrier,
-               r_sensorDETE
-              },
+              
+              r_sensorDETE},
        comm({s_liState|r_liState->comm_liState,s_beState|r_beState->comm_beState,s_barState|r_barState->comm_barState,
              s_safeSign|r_safeSign->comm_safeSign,r_track1Info|s_track1Info->comm_track1Info,r_track2Info|s_track2Info->comm_track2Info},
                                    Light(OFF)||Bell(OFF)||Barrier(OPEN)||safeVerify(CLEAR,CLEAR)||
-                                   track1State(CLEAR,LEAVE_e)||track2State(CLEAR,LEAVE_e)
+                                   track1State(CLEAR,None)||track2State(CLEAR,None)
             )
              );
