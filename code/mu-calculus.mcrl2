@@ -1,0 +1,31 @@
+%mu-calculus in mcf
+
+%1.Lights 
+%(a)i The traffic lights may only be on if one of the sensors from S1e and S1w or/and one of the sensors form S2e and S2w detect a train.
+[true*] . [a_setLight(bothL,OFF).(!r_sensorDETE(S1w,DETECTED) && !r_sensorDETE(S1e,DETECTED) 
+                                     && !r_sensorDETE(S2w,DETECTED) && !r_sensorDETE(S2e,DETECTED))* . a_setLight(bothL,ON)]false
+%(a)ii initial
+[!r_sensorDETE(S1w,DETECTED) && !r_sensorDETE(S1e,DETECTED)
+                          && !r_sensorDETE(S2w,DETECTED) && !r_sensorDETE(S2e,DETECTED))* . a_setLight(bothL,ON)]false
+
+%(b) The traffic lights may only be off if the bell is off.
+[true*] . [a_setLight(bothL,ON).(!a_setBell(Bellc,OFF))* . a_setLight(bothL,OFF)]false
+
+%2.Bell
+%(a)The bell may only be on if the light is on.
+[true*] . [a_setBell(Bellc,OFF) . (!a_setLight(bothL,ON))* . a_setBell(Bellc,ON)]false
+
+%(a)ii initial
+[(!a_setLight(bothL,ON))* . a_setBell(Bellc,ON)]false
+
+%(b)The bell may only be off if the barriers are open.
+[true*] . [a_setBell(Bellc,ON) . (!a_setBarrier(bothB,OPEN))* . a_setBell(Bellc,OFF)]false
+
+%3.Barriers
+%(a) The barriers may only be close if at least one of the sensors detects a train.
+[true*] forall S:SensorID . [a_setBarrier(bothB,OPEN).(!r_sensorDETE(S,DETEDTED))* a_setBarrier(bothB,CLOSED)]false
+%initial
+forall S:SensorID . [(!r_sensorDETE(S,DETEDTED))* a_setBarrier(bothB,CLOSED)]false
+
+%4.The train can only be on the crossing when the barriers are close.
+[true*] . [a_setBarrier(bothB,CLOSED)*]<r_sensorDETE(S1train,DETECTED)||r_sensorDETE(S2train,DETECTED)>true
