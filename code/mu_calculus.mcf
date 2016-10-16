@@ -1,0 +1,19 @@
+% mu-calculus in mcf
+
+% 1.a)
+[true*] forall S:SensorID . [(!r_sensorDETE(S, DETECTED))* . a_setLight(bothL, ON)]false
+
+% 1.b)
+[true*] . [(!a_setBell(Bellc, ON))* . a_setLight(bothL, ON)]false 
+
+% 2.a)
+[true*] . [a_setLight(bothL, OFF) . (!a_setLight(bothL, ON))* . a_setBell(Bellc, ON)]false
+
+% 2.b)
+[true*] . [a_setBarrier(bothB, CLOSED) . (!a_setBarrier(bothB, OPEN))* . a_setBell(Bellc, OFF)]false
+
+% 3.a)
+[true*] forall S:SensorID . [(!r_sensorDETE(S, DETECTED))* . a_setBarrier(bothB, CLOSED)]false
+
+% 4
+[true*] . [a_setBarrier(bothB, CLOSED)*]<r_sensorDETE(S1train, DETECTED)||r_sensorDETE(S2train, DETECTED)>true
