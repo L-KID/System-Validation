@@ -1,0 +1,2 @@
+%(a)ii initial bell
+[(!a_setLight(bothL,ON))* . a_setBell(Bellc,ON)]false
