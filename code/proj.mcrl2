@@ -1,5 +1,10 @@
+%The third version of the model: simple modeling a train crossing
+%Not including some cases (more information is in report)
+%Still 8 deadlocks
+
+
 sort 	% Multi-Objects
-	LightID        =struct Ln|Ls|bothL;
+       LightID        =struct Ln|Ls|bothL;
        BellID         =struct Bellc;
        BarrierID      =struct Bn|Bs|bothB;
        SensorID       =struct S1w|S1train|S1e|
@@ -10,16 +15,15 @@ sort 	% Multi-Objects
 	
 
        % States
-	State 		= struct ON | OFF;		% Traffic Lights, Bell
+       State 		= struct ON | OFF;		% Traffic Lights, Bell
        barState 	= struct OPEN | CLOSED;	% Barriers
-	sensorState 	= struct DETECTED;	% Sensors
+       sensorState 	= struct DETECTED;	% Sensors
        safeSign       = struct SAFE|UNSAFE;
        
        trainPosition      = struct ARRIVE_e|CENTRAL2w|LEAVE_w|
                                ARRIVE_w|CENTRAL2e|LEAVE_e;
        trackInfo       = struct OCCUPIED|CLEAR;
-        
-       change          =struct CHANGING|STATIC;                       
+       %change          =struct CHANGING|STATIC;                       
 
 %map % Matching sensors to positions 
 %      matchSensorPos: SensorID -> trackInfo;	
@@ -41,15 +45,15 @@ act    %communication
 
 proc   %LBB(light:State,bell:State,barrier:barState)=
 
-       %            (light==OFF)->r_safeSign(UNSAFE).a_setLight(bothL,ON).a_setBell(Bellc,ON).a_setBarrier(bothB,CLOSED).LBB(ON,ON,CLOSED)+
-       %            (barrier==CLOSED)->r_safeSign(SAFE).a_setBarrier(bothB,OPEN).a_setBell(Bellc,OFF).a_setLight(bothL,OFF).LBB(OFF,OFF,OPEN);
+       %  (light==OFF)->r_safeSign(UNSAFE).a_setLight(bothL,ON).a_setBell(Bellc,ON).a_setBarrier(bothB,CLOSED).LBB(ON,ON,CLOSED)+
+       %  (barrier==CLOSED)->r_safeSign(SAFE).a_setBarrier(bothB,OPEN).a_setBell(Bellc,OFF).a_setLight(bothL,OFF).LBB(OFF,OFF,OPEN);
 
        Light(ls:State)=
-                       (ls==OFF)-> r_safeSign(UNSAFE).a_setLight(bothL,ON). s_liState(ON).Light(ON)+
-                       (ls==ON)->  r_beState(OFF).a_setLight(bothL,OFF).Light(OFF);
+               (ls==OFF)-> r_safeSign(UNSAFE).a_setLight(bothL,ON). s_liState(ON).Light(ON)+
+               (ls==ON)->  r_beState(OFF).a_setLight(bothL,OFF).Light(OFF);
                       
-                       %To make sure that repeated communication can also go through so that the state of the sender can change on time.                     
-                       %(ls==ON)-> r_safeSign(UNSAFE).Light(ON);
+              %To make sure that repeated communication can also go through so that the state of the sender can change on time.                     
+              %(ls==ON)-> r_safeSign(UNSAFE).Light(ON);
        
        Bell(beS:State)= (beS==OFF)-> r_liState(ON).a_setBell(Bellc,ON).s_beState(ON).Bell(ON)+
                         (beS==ON)->r_barState(OPEN).a_setBell(Bellc,OFF).s_beState(OFF).Bell(OFF);
@@ -58,10 +62,6 @@ proc   %LBB(light:State,bell:State,barrier:barState)=
                              (bas==CLOSED)->r_safeSign(SAFE).a_setBarrier(bothB,OPEN).s_barState(OPEN).Barrier(OPEN);
        
         safeVerify(T1State:trackInfo,T2State:trackInfo)=
-    
-                   
-    
-
                    (T1State==CLEAR)->r_track1Info(T1,OCCUPIED).s_safeSign(UNSAFE).safeVerify(T1State=OCCUPIED)+
                    (T2State==CLEAR)->r_track2Info(T2,OCCUPIED).s_safeSign(UNSAFE).safeVerify(T2State=OCCUPIED)+
                    (T1State==OCCUPIED)->r_track1Info(T1,CLEAR).
@@ -73,52 +73,52 @@ proc   %LBB(light:State,bell:State,barrier:barState)=
        track1State(tr1:trackInfo,pos:trainPosition)=
               %a train arrives from east when there's no train on track1 at the crossing.
                     (tr1==CLEAR)->r_sensorDETE(S1e,DETECTED).s_track1Info(T1,OCCUPIED).track1State(OCCUPIED,ARRIVE_e)+
-                    %a train arrives from east when there is a train on track1 around the central of the crossing.
+              %a train arrives from east when there is a train on track1 around the central of the crossing.
                            
-                    %a train passes the central sensor S1train and no other train on track1 arrives.
+              %a train passes the central sensor S1train and no other train on track1 arrives.
                     
                     ((tr1==OCCUPIED)&&(pos==ARRIVE_e))->r_sensorDETE(S1train,DETECTED).track1State(OCCUPIED,CENTRAL2w)+
-                    %a train arrives from east when the is a train on track1 leaving the crossing.
+              %a train arrives from east when the is a train on track1 leaving the crossing.
                        
-                    %a train leaves the crossing and no other train on track1 arrives.
+              %a train leaves the crossing and no other train on track1 arrives.
                     ((tr1==OCCUPIED)&&(pos==CENTRAL2w))->r_sensorDETE(S1w,DETECTED).s_track1Info(T1,CLEAR).track1State(CLEAR,LEAVE_w)+
                             
 
               %a train comes from west when there's no train on track1 at the crossing.
                     (tr1==CLEAR)->r_sensorDETE(S1w,DETECTED).s_track1Info(T1,OCCUPIED).track1State(OCCUPIED,ARRIVE_w)+
-                    %a train arrives from west when there is a train on track1 around the central of the crossing.
+              %a train arrives from west when there is a train on track1 around the central of the crossing.
                             
-                    %a train passes the central sensor S1train and no other train on track1 arrives.
+              %a train passes the central sensor S1train and no other train on track1 arrives.
                     ((tr1==OCCUPIED)&&(pos==ARRIVE_w)) ->r_sensorDETE(S1train,DETECTED).track1State(OCCUPIED,CENTRAL2e)+
-                    %a train arrives from east when there is a train on track1 leaving the crossing.
+              %a train arrives from east when there is a train on track1 leaving the crossing.
                             
-                    %a train leaves the crossing and no other train on track1 arrives.
+              %a train leaves the crossing and no other train on track1 arrives.
                     ((tr1==OCCUPIED)&&(pos==CENTRAL2e))->r_sensorDETE(S1e,DETECTED).s_track1Info(T1,CLEAR).track1State(CLEAR,LEAVE_e);
         
          track2State(tr2:trackInfo,pos:trainPosition)=
         
               %a train arrives from east when there's no train on track2 at the crossing.
-                     (tr2==CLEAR)->r_sensorDETE(S2e,DETECTED).s_track2Info(T2,OCCUPIED).track2State(OCCUPIED,ARRIVE_e)+
-                            %a train arrives from east when there is a train on track2 around the central of the crossing.
+              (tr2==CLEAR)->r_sensorDETE(S2e,DETECTED).s_track2Info(T2,OCCUPIED).track2State(OCCUPIED,ARRIVE_e)+
+              %a train arrives from east when there is a train on track2 around the central of the crossing.
                            
-                            %a train passes the central sensor S1train and no other train on track2 arrives.
-                            ((tr2==OCCUPIED)&&(pos==ARRIVE_e)) ->r_sensorDETE(S2train,DETECTED).track2State(OCCUPIED,CENTRAL2w)+
-                            %a train arrives from east when there is a train on track2 leaving the crossing.
+              %a train passes the central sensor S1train and no other train on track2 arrives.
+              ((tr2==OCCUPIED)&&(pos==ARRIVE_e)) ->r_sensorDETE(S2train,DETECTED).track2State(OCCUPIED,CENTRAL2w)+
+              %a train arrives from east when there is a train on track2 leaving the crossing.
                             
-                            %a train leaves the crossing and no other train on track2 arrives.
-                            ((tr2==OCCUPIED)&&(pos==CENTRAL2w))->r_sensorDETE(S2w,DETECTED).s_track2Info(T2,CLEAR).track2State(CLEAR,LEAVE_w)+
+              %a train leaves the crossing and no other train on track2 arrives.
+              ((tr2==OCCUPIED)&&(pos==CENTRAL2w))->r_sensorDETE(S2w,DETECTED).s_track2Info(T2,CLEAR).track2State(CLEAR,LEAVE_w)+
                             
 
-                %a train comes from west when there's no train on track2 at the crossing.
-                            (tr2==CLEAR)->r_sensorDETE(S2w,DETECTED).s_track2Info(T2,OCCUPIED).track2State(OCCUPIED,ARRIVE_w)+
-                            %a train arrives from west when there is a train on track2 around the central of the crossing.
+               %a train comes from west when there's no train on track2 at the crossing.
+              (tr2==CLEAR)->r_sensorDETE(S2w,DETECTED).s_track2Info(T2,OCCUPIED).track2State(OCCUPIED,ARRIVE_w)+
+               %a train arrives from west when there is a train on track2 around the central of the crossing.
                            
-                            %a train passes the central sensor S1train and no other train on track2 arrives.
-                            ((tr2==OCCUPIED)&&(pos==ARRIVE_w)) ->r_sensorDETE(S2train,DETECTED).track2State(OCCUPIED,CENTRAL2e)+
-                            %a train arrives from east when there is a train on track2 leaving the crossing.
+               %a train passes the central sensor S1train and no other train on track2 arrives.
+              ((tr2==OCCUPIED)&&(pos==ARRIVE_w)) ->r_sensorDETE(S2train,DETECTED).track2State(OCCUPIED,CENTRAL2e)+
+               %a train arrives from east when there is a train on track2 leaving the crossing.
                             
-                            %a train leaves the crossing and no other train on track2 arrives.
-                            ((tr2==OCCUPIED)&&(pos==CENTRAL2e))->r_sensorDETE(S2e,DETECTED).s_track2Info(T2,CLEAR).track2State(CLEAR,LEAVE_e);                   
+               %a train leaves the crossing and no other train on track2 arrives.
+              ((tr2==OCCUPIED)&&(pos==CENTRAL2e))->r_sensorDETE(S2e,DETECTED).s_track2Info(T2,CLEAR).track2State(CLEAR,LEAVE_e);                   
        
 
 
@@ -128,7 +128,8 @@ init   allow ({comm_liState,comm_beState,comm_barState,comm_safeSign,comm_track1
                r_sensorDETE
               },
        comm({s_liState|r_liState->comm_liState,s_beState|r_beState->comm_beState,s_barState|r_barState->comm_barState,
-             s_safeSign|r_safeSign->comm_safeSign,r_track1Info|s_track1Info->comm_track1Info,r_track2Info|s_track2Info->comm_track2Info},
+             s_safeSign|r_safeSign->comm_safeSign,r_track1Info|s_track1Info->comm_track1Info,
+             r_track2Info|s_track2Info->comm_track2Info},
                                    Light(OFF)||Bell(OFF)||Barrier(OPEN)||
                                    %LBB(OFF,OFF,OPEN)||
                                    safeVerify(CLEAR,CLEAR)||
