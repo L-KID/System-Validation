@@ -1,0 +1,2 @@
+%4.The train can only be on the crossing when the barriers are close.
+[true*] . [a_setBarrier(bothB,CLOSED)*]<r_sensorDETE(S1train,DETECTED)||r_sensorDETE(S2train,DETECTED)>true

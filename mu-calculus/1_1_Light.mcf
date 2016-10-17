@@ -1,0 +1,4 @@
+%1.Lights 
+%(a)i The traffic lights may only be on if one of the sensors from S1e and S1w or/and one of the sensors form S2e and S2w detect a train.
+[true*] . [a_setLight(bothL,OFF).(!r_sensorDETE(S1w,DETECTED) && !r_sensorDETE(S1e,DETECTED) 
+                                     && !r_sensorDETE(S2w,DETECTED) && !r_sensorDETE(S2e,DETECTED))* . a_setLight(bothL,ON)]false
