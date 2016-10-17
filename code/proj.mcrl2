@@ -58,10 +58,7 @@ proc   %LBB(light:State,bell:State,barrier:barState)=
                              (bas==CLOSED)->r_safeSign(SAFE).a_setBarrier(bothB,OPEN).s_barState(OPEN).Barrier(OPEN);
        
         safeVerify(T1State:trackInfo,T2State:trackInfo)=
-        %            r_sensorDETE(S1w,DETECTED).safeVerify(T1State=ARRIVE_w)+
-         %           r_sensorDETE(S1e,DETECTED).safeVerify(T1State=ARRIVE_e)+
-        %            r_sensorDETE(S2w,DETECTED).safeVerify(T2State=ARRIVE_w)+
-         %           r_sensorDETE(S2e,DETECTED).safeVerify(T2State=ARRIVE_e);
+    
                    
     
 
