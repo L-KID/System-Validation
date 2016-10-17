@@ -1,2 +1,2 @@
 %(b) The traffic lights may only be off if the bell is off.
-[true*] . [a_setLight(bothL,ON).(!a_setBell(Bellc,OFF))* . a_setLight(bothL,OFF)]false
+[true*][a_setLight(bothL,ON).(!a_setBell(Bellc,OFF))* . a_setLight(bothL,OFF)]false

@@ -1,2 +1,2 @@
 %(b)The bell may only be off if the barriers are open.
-[true*] . [a_setBell(Bellc,ON) . (!a_setBarrier(bothB,OPEN))* . a_setBell(Bellc,OFF)]false
+[true*] [a_setBell(Bellc,ON) . (!a_setBarrier(bothB,OPEN))* . a_setBell(Bellc,OFF)]false
