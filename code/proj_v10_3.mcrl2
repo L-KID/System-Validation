@@ -10,7 +10,8 @@ sort
 sensorEdge     = struct S1e|S1w|S2e|S2w;%Sensors that are related to arrival and leaving.
 sensorCentral  = struct S1train|S2train;%Sensors that are related to current existance of the train.
 %trackID
-trackID        = struct T1|T2;
+trackID        = struct T1|T2|STATIC;   %trackID is used to record on which track is the last train on. And STATIC is used when 
+                                        %the System is safe and which is the last active track does not matter any more.
 %states
 safeState      = struct SAFE|UNSAFE;    %system safe state
 State          = struct ON|OFF;         %states of traffic lights and bell       
@@ -109,7 +110,7 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%             
             +((barST==CLOSED)&&(lastTrack==T2)&&
               (
-               (lastState1==CLEAR)||(lastState1==CENTRAL2w)||(lastState1==ARRIVE_e)
+               (lastState1==CLEAR)||(lastState1==CENTRAL2w)||(lastState1==ARRIVE_e)||(lastState1==LEAVE_w)
                )           
              )
                                          ->r_sensorEdge(S1e).a_recTrack(T1,ARRIVE_e).Barriers(lastTrack=T1,lastState1=ARRIVE_e)
@@ -122,7 +123,7 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%           
             +((barST==CLOSED)&&(lastTrack==T2)&&
               (
-               (lastState1==CLEAR)||(lastState1==CENTRAL2e)||(lastState1==ARRIVE_w)
+               (lastState1==CLEAR)||(lastState1==CENTRAL2e)||(lastState1==ARRIVE_w)||(lastState1==LEAVE_e)
                )           
              )
                                          ->r_sensorEdge(S1w).a_recTrack(T1,ARRIVE_w).Barriers(lastTrack=T1,lastState1=ARRIVE_w)
@@ -135,7 +136,7 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             +((barST==CLOSED)&&(lastTrack==T1)&&
               (
-               (lastState2==CLEAR)||(lastState2==CENTRAL2e)||(lastState2==ARRIVE_w)
+               (lastState2==CLEAR)||(lastState2==CENTRAL2e)||(lastState2==ARRIVE_w)||(lastState2==LEAVE_e)
                )           
              )
                                          ->r_sensorEdge(S2w).a_recTrack(T2,ARRIVE_w).Barriers(lastTrack=T2,lastState2=ARRIVE_w)
@@ -148,7 +149,7 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             +((barST==CLOSED)&&(lastTrack==T1)&&
               (
-               (lastState2==CLEAR)||(lastState2==CENTRAL2w)||(lastState2==ARRIVE_e)
+               (lastState2==CLEAR)||(lastState2==CENTRAL2w)||(lastState2==ARRIVE_e)||(lastState2==LEAVE_w)
                )           
              )
                                          ->r_sensorEdge(S2e).a_recTrack(T2,ARRIVE_e).Barriers(lastTrack=T2,lastState2=ARRIVE_e)
@@ -166,7 +167,7 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
                ((lastTrack==T2)&&((lastState2==LEAVE_w)||(lastState2==LEAVE_e)))
                )
              ) ->a_recTrack(lastTrack,CLEAR).a_setBarrier(SAFE,OPEN).s_barrier2bell(SAFE).
-                                           Barriers(saf=SAFE,barST=OPEN,lastState1=CLEAR,lastState2=CLEAR);
+                                           Barriers(saf=SAFE,barST=OPEN,lastTrack=STATIC,lastState1=CLEAR,lastState2=CLEAR);
 
 init 
     allow
@@ -180,6 +181,6 @@ init
             s_bell2barrier|r_bell2barrier->c_bell2barrier,s_barrier2bell|r_barrier2bell->c_barrier2bell,
             s_bell2light|r_bell2light->c_bell2light
            },
-           safetyConfirm(SAFE)||Lights(SAFE,OFF)||Bell(SAFE,OFF)||Barriers(SAFE,OPEN,T1,CLEAR,CLEAR)
+           safetyConfirm(SAFE)||Lights(SAFE,OFF)||Bell(SAFE,OFF)||Barriers(SAFE,OPEN,STATIC,CLEAR,CLEAR)
          )
 );
