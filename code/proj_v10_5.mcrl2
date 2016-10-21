@@ -6,7 +6,7 @@
 %%%%%v10.4: "S1w-S2w-S1w" cases are forbidden
 %%%%%     :Assume that the length of the trains is shorter than the distance between the neighbor sensors.
 %%%%%     :In one triggered case trains cannot come on the same track from different directions.
-%%%%%     :Add cases of multiple trains arriving on same track without any activities on the other track
+%%%%%v10.5:Add cases of multiple trains arriving on same track without any activities on the other track
 
 sort 
 %sensors 
@@ -26,27 +26,27 @@ trackState    = struct  ARRIVE_e|CENTRAL2w|LEAVE_w|
                         CLEAR;
 
 map
-%map the trackID to corresponding central sensors
-matchCentral:       trackID->sensorCentral;
+%%%%%%%%%%%%%Not Used%%%%%%%%%%%%%map the trackID to corresponding central sensors
+%matchCentral:       trackID->sensorCentral;
 %map the edge sensors to corresponding "first" tracks
-matchTrack:         sensorEdge->trackID;
+matchTrack:          sensorEdge->trackID;
 %map the edge sensors to corresponding track states
 matchFState1:        sensorEdge->trackState;
 matchFState2:        sensorEdge->trackState;
-%map the normal sequence for the train to pass
-matchST2ST:          trackState->trackState;
+%%%%%%%%%%%%%Not Used%%%%%%%%%%%%%map the normal sequence for the train to pass
+%matchST2ST:          trackState->trackState;
 
 
 eqn
-%a former state->next state of a track
-matchST2ST(ARRIVE_e)=CENTRAL2w;
-matchST2ST(CENTRAL2w)=LEAVE_w;
-matchST2ST(ARRIVE_w)=CENTRAL2e;
-matchST2ST(CENTRAL2e)=LEAVE_e;
+%%%%%%%%%%%%%Not Used%%%%%%%%%%%%a former state->next state of a track
+%matchST2ST(ARRIVE_e)=CENTRAL2w;
+%matchST2ST(CENTRAL2w)=LEAVE_w;
+%matchST2ST(ARRIVE_w)=CENTRAL2e;
+%matchST2ST(CENTRAL2e)=LEAVE_e;
 
-%trackID <-> corresponding central sensors
-matchCentral(T1)=S1train;
-matchCentral(T2)=S2train;
+%%%%%%%%%%%%%Not Used%%%%%%%%%%%%%trackID <-> corresponding central sensors
+%matchCentral(T1)=S1train;
+%matchCentral(T2)=S2train;
   
 %Edge sensors <-> corresponding tracks
 matchTrack(S1e)=T1;
