@@ -3,9 +3,10 @@
 %Project2016, System validation
 %Group 02
 
-%%%%%v10.4: "S1w-S2w-S1w" cases are forbidden(still no case of multiple trains arrive on same track)
+%%%%%v10.4: "S1w-S2w-S1w" cases are forbidden
 %%%%%     :Assume that the length of the trains is shorter than the distance between the neighbor sensors.
 %%%%%     :In one triggered case trains cannot come on the same track from different directions.
+%%%%%     :Add cases of multiple trains arriving on same track without any activities on the other track
 
 sort 
 %sensors 
@@ -123,6 +124,11 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
             
             +((barST==CLOSED)&&(lastTrack==T1)&&(lastState1==CENTRAL2w))
                                          ->r_sensorEdge(S1w).a_recTrack(T1,LEAVE_w).Barriers(lastState1=LEAVE_w)
+
+            +(
+              (barST==CLOSED)&&(lastTrack==T1)&&((lastState1==CENTRAL2w)||(lastState1==LEAVE_w))
+             )
+                                         ->r_sensorEdge(S1e).a_recTrack(T1,ARRIVE_e).Barriers(lastState1=ARRIVE_e)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%           
             +((barST==CLOSED)&&(lastTrack==T2)&&
               (
@@ -137,6 +143,10 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 
             +((barST==CLOSED)&&(lastTrack==T1)&&(lastState1==CENTRAL2e))
                                          ->r_sensorEdge(S1e).a_recTrack(T1,LEAVE_e).Barriers(lastState1=LEAVE_e)
+            +(
+              (barST==CLOSED)&&(lastTrack==T1)&&((lastState1==CENTRAL2e)||(lastState1==LEAVE_e))
+             )
+                                         ->r_sensorEdge(S1w).a_recTrack(T1,ARRIVE_w).Barriers(lastState1=ARRIVE_w)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             +((barST==CLOSED)&&(lastTrack==T1)&&
               (
@@ -151,6 +161,11 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 
             +((barST==CLOSED)&&(lastTrack==T2)&&(lastState2==CENTRAL2e))
                                          ->r_sensorEdge(S2e).a_recTrack(T2,LEAVE_e).Barriers(lastState2=LEAVE_e)
+
+            +(
+              (barST==CLOSED)&&(lastTrack==T2)&&((lastState2==CENTRAL2e)||(lastState2==LEAVE_e))
+             )
+                                         ->r_sensorEdge(S2w).a_recTrack(T2,ARRIVE_w).Barriers(lastState2=ARRIVE_w)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             +((barST==CLOSED)&&(lastTrack==T1)&&
               (
@@ -165,6 +180,11 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 
             +((barST==CLOSED)&&(lastTrack==T2)&&(lastState2==CENTRAL2w))
                                          ->r_sensorEdge(S2w).a_recTrack(T2,LEAVE_w).Barriers(lastState2=LEAVE_w)
+
+            +(
+              (barST==CLOSED)&&(lastTrack==T2)&&((lastState2==CENTRAL2w)||(lastState2==LEAVE_w))
+             )
+                                         ->r_sensorEdge(S2e).a_recTrack(T2,ARRIVE_e).Barriers(lastState2=ARRIVE_e)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             +(
              (barST==CLOSED)&&
