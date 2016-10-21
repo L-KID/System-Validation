@@ -1,0 +1,3 @@
+%3.Barriers
+%(a) The barriers may only be close if at least one of the edge sensors detects a train.
+[true*][a_setSystem(SAFE).(!r_sensorEdge(S1e) && !r_sensorEdge(S1w) && !r_sensorEdge(S2e) && !r_sensorEdge(S2w))*. a_setBarrier(UNSAFE,CLOSED)]false
