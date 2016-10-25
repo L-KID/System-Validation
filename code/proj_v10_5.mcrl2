@@ -1,12 +1,12 @@
-%The fifth version of train crossing model, change the architecture
+%The fifth version of train crossing model, changed the architecture
 %Original architecure is difficult to deal with the sequence of the barrier state and train position
 %Project2016, System validation
 %Group 02
 
-%%%%%v10.4: "S1w-S2w-S1w" cases are forbidden
 %%%%%     :Assume that the length of the trains is shorter than the distance between the neighbor sensors.
-%%%%%     :In one triggered case trains cannot come on the same track from different directions.
-%%%%%v10.5:Add cases of multiple trains arriving on same track without any activities on the other track
+%%%%%     :Assume that the trains obey first in first out order, so that after the last arriving train leaves, no train 
+%          exists on the crossing anymore
+%%%%%v10.5%%%%%%%%
 
 sort 
 %sensors 
@@ -19,35 +19,18 @@ trackID        = struct T1|T2|STATIC;   %trackID is used to record on which trac
 safeState      = struct SAFE|UNSAFE;    %system safe state
 State          = struct ON|OFF;         %states of traffic lights and bell       
 barState       = struct OPEN|CLOSED;    %states of barriers 
-%trackState     = struct OCCUPIED|CLEAR; %states of track: OCCUPIED stands for there is train inside the range of 2 edge sensors of the track;
-                                        %CLEAR means there is no train inside the range of 2 edge sensors. 
 trackState    = struct  ARRIVE_e|CENTRAL2w|LEAVE_w|
                         ARRIVE_w|CENTRAL2e|LEAVE_e|
                         CLEAR;
 
 map
-%%%%%%%%%%%%%Not Used%%%%%%%%%%%%%map the trackID to corresponding central sensors
-%matchCentral:       trackID->sensorCentral;
 %map the edge sensors to corresponding "first" tracks
 matchTrack:          sensorEdge->trackID;
 %map the edge sensors to corresponding track states
 matchFState1:        sensorEdge->trackState;
 matchFState2:        sensorEdge->trackState;
-%%%%%%%%%%%%%Not Used%%%%%%%%%%%%%map the normal sequence for the train to pass
-%matchST2ST:          trackState->trackState;
 
-
-eqn
-%%%%%%%%%%%%%Not Used%%%%%%%%%%%%a former state->next state of a track
-%matchST2ST(ARRIVE_e)=CENTRAL2w;
-%matchST2ST(CENTRAL2w)=LEAVE_w;
-%matchST2ST(ARRIVE_w)=CENTRAL2e;
-%matchST2ST(CENTRAL2e)=LEAVE_e;
-
-%%%%%%%%%%%%%Not Used%%%%%%%%%%%%%trackID <-> corresponding central sensors
-%matchCentral(T1)=S1train;
-%matchCentral(T2)=S2train;
-  
+eqn 
 %Edge sensors <-> corresponding tracks
 matchTrack(S1e)=T1;
 matchTrack(S1w)=T1;
@@ -107,10 +90,12 @@ Bell(saf:safeState,state:State)=
 Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,lastState2:trackState)=
 %lastTrack:the train on which will leave later than that on the other track;
 %lastState:the state of lastTrack
+
              %receive the first trigger
              ((saf==SAFE)&&(barST==OPEN))->sum sE:sensorEdge.r_bell2barrier(sE,UNSAFE).a_setBarrier(UNSAFE,CLOSED).
                                          Barriers(UNSAFE,CLOSED,matchTrack(sE),matchFState1(sE),matchFState2(sE))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%             
+%A train arrives from east on track1 when there is/are train(s) on track2
             +((barST==CLOSED)&&(lastTrack==T2)&&
               (
                (lastState1==CLEAR)||(lastState1==CENTRAL2w)||(lastState1==LEAVE_w)||
@@ -124,12 +109,14 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
             
             +((barST==CLOSED)&&(lastTrack==T1)&&(lastState1==CENTRAL2w))
                                          ->r_sensorEdge(S1w).a_recTrack(T1,LEAVE_w).Barriers(lastState1=LEAVE_w)
-
+%A train arrives from east on track1 when there is/are train(s) on track1. 
+%It can come only after the former train is detected by central sensors.
             +(
               (barST==CLOSED)&&(lastTrack==T1)&&((lastState1==CENTRAL2w)||(lastState1==LEAVE_w))
              )
                                          ->r_sensorEdge(S1e).a_recTrack(T1,ARRIVE_e).Barriers(lastState1=ARRIVE_e)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%           
+%A train arrives from west on track1 when there is/are train(s) on track2
             +((barST==CLOSED)&&(lastTrack==T2)&&
               (
                (lastState1==CLEAR)||(lastState1==CENTRAL2e)||(lastState1==LEAVE_e)||
@@ -143,11 +130,14 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 
             +((barST==CLOSED)&&(lastTrack==T1)&&(lastState1==CENTRAL2e))
                                          ->r_sensorEdge(S1e).a_recTrack(T1,LEAVE_e).Barriers(lastState1=LEAVE_e)
+%A train arrives from west on track1 when there is/are train(s) on track1. 
+%It can come only after the former train is detected by central sensors.
             +(
               (barST==CLOSED)&&(lastTrack==T1)&&((lastState1==CENTRAL2e)||(lastState1==LEAVE_e))
              )
                                          ->r_sensorEdge(S1w).a_recTrack(T1,ARRIVE_w).Barriers(lastState1=ARRIVE_w)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%A train arrives from west on track2 when there is/are train(s) on track1
             +((barST==CLOSED)&&(lastTrack==T1)&&
               (
                (lastState2==CLEAR)||(lastState2==CENTRAL2e)||(lastState2==LEAVE_e)||
@@ -161,12 +151,14 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 
             +((barST==CLOSED)&&(lastTrack==T2)&&(lastState2==CENTRAL2e))
                                          ->r_sensorEdge(S2e).a_recTrack(T2,LEAVE_e).Barriers(lastState2=LEAVE_e)
-
+%A train arrives from west on track2 when there is/are train(s) on track2. 
+%It can come only after the former train is detected by central sensors.
             +(
               (barST==CLOSED)&&(lastTrack==T2)&&((lastState2==CENTRAL2e)||(lastState2==LEAVE_e))
              )
                                          ->r_sensorEdge(S2w).a_recTrack(T2,ARRIVE_w).Barriers(lastState2=ARRIVE_w)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%A train arrives from east on track2 when there is/are train(s) on track1
             +((barST==CLOSED)&&(lastTrack==T1)&&
               (
                (lastState2==CLEAR)||(lastState2==CENTRAL2w)||(lastState2==LEAVE_w)||
@@ -180,12 +172,14 @@ Barriers(saf:safeState,barST:barState,lastTrack:trackID,lastState1:trackState,la
 
             +((barST==CLOSED)&&(lastTrack==T2)&&(lastState2==CENTRAL2w))
                                          ->r_sensorEdge(S2w).a_recTrack(T2,LEAVE_w).Barriers(lastState2=LEAVE_w)
-
+%A train arrives from east on track2 when there is/are train(s) on track2. 
+%It can come only after the former train is detected by central sensors.
             +(
               (barST==CLOSED)&&(lastTrack==T2)&&((lastState2==CENTRAL2w)||(lastState2==LEAVE_w))
              )
                                          ->r_sensorEdge(S2e).a_recTrack(T2,ARRIVE_e).Barriers(lastState2=ARRIVE_e)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%No more trains come after the last train leaves and the Barriers send the safe state to safetyConfirm through Bell and Lights.
             +(
              (barST==CLOSED)&&
                (
