@@ -1,3 +1,0 @@
-%(a)ii initial light
-[(!r_sensorDETE(S1w,DETECTED) && !r_sensorDETE(S1e,DETECTED)
-                          && !r_sensorDETE(S2w,DETECTED) && !r_sensorDETE(S2e,DETECTED))* . a_setLight(bothL,ON)]false

@@ -1,3 +1,0 @@
-%3.Barriers
-%(a) The barriers may only be close if at least one of the sensors detects a train.
-[true*] forall S:SensorID . [a_setBarrier(bothB,OPEN).(!r_sensorDETE(S,DETECTED))*. a_setBarrier(bothB,CLOSED)]false

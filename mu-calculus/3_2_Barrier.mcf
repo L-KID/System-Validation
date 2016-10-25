@@ -1,2 +1,0 @@
-%initial barrier
-forall S:SensorID . [(!r_sensorDETE(S,DETEDTED))* .a_setBarrier(bothB,CLOSED)]false
