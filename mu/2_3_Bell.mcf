@@ -1,2 +1,4 @@
-%(b)The bell may only be off if the barriers are open.
+%2. Bell 
+%(b)The bell may only be switched off if the barriers are open.
+
 [true*] [a_setBarrier(UNSAFE,CLOSED) . (!a_setBarrier(SAFE,OPEN))* . a_setBell(SAFE,OFF)]false

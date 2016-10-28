@@ -1,4 +1,5 @@
 %1.Lights 
-%(a)i The traffic lights may only be on if one of the sensors from S1e and S1w or/and one of the sensors form S2e and S2w detect a train.
+%(a)The traffic lights may only be on if one of the sensors from S1e and S1w or/and one of the sensors form S2e and S2w detect a train.
+
 [true*] [a_setSystem(SAFE).(!r_sensorEdge(S1w) && !r_sensorEdge(S1e) 
                                      && !r_sensorEdge(S2w) && !r_sensorEdge(S2e))* . a_setLight(UNSAFE,ON)]false

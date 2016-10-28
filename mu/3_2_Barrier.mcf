@@ -1,2 +1,5 @@
-%initial barrier
+%3. Barriers
+%a) The barriers may be closed if at least one of the sensors detects a train.
+%ii. initial
+
 [(!r_sensorEdge(S1e) && !r_sensorEdge(S1w) && !r_sensorEdge(S2e) && !r_sensorEdge(S2w))* .a_setBarrier(UNSAFE,CLOSED)]false

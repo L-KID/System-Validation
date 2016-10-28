@@ -1,3 +1,4 @@
 %2.Bell
 %(a)The bell may only be on if the light is on.
+
 [true*] [a_setLight(SAFE,OFF) . (!a_setLight(UNSAFE,ON))* . a_setBell(UNSAFE,ON)]false
