@@ -1,0 +1,2 @@
+%4.The train can only be on the crossing when the barriers are close.
+[true*] [a_setBarrier(SAFE,OPEN).(!a_setBarrier(UNSAFE,CLOSED))*.(r_sensorCentral(S1train) || r_sensorCentral(S2train))]false

@@ -1,0 +1,3 @@
+%3.Barriers
+%b) The barriers may only be opened if there are no trains on both track.
+[true*][(a_recTrack(T1,LEAVE_w)||a_recTrack(T1,LEAVE_e)||a_recTrack(T2,LEAVE_w)||a_recTrack(T2,LEAVE_e)).(!a_recTrack(T1,CLEAR) && !a_recTrack(T2,CLEAR))*.a_setBarrier(SAFE,OPEN)]false

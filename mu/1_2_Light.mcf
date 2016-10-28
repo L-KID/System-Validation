@@ -1,0 +1,2 @@
+%(a)ii initial light
+[(!r_sensorEdge(S1w) && !r_sensorEdge(S1e) && !r_sensorEdge(S2w) && !r_sensorEdge(S2e))* . a_setLight(UNSAFE,ON)]false

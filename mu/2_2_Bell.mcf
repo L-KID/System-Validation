@@ -1,0 +1,2 @@
+%(a)ii initial bell
+[(!a_setLight(UNSAFE,ON))* . a_setBell(UNSAFE,ON)]false
