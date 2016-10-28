@@ -1,2 +1,4 @@
-%(a)ii initial bell
+%2. Bell
+%a) The bell may only be switched on if the light is on.
+%ii initial 
 [(!a_setLight(UNSAFE,ON))* . a_setBell(UNSAFE,ON)]false

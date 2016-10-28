@@ -1,0 +1,4 @@
+%5. From the unsafe sate (that is, with the lights on, bell on and the barriers closed), 
+% the system must be able to reach the safe state (that is, with the barriers open, bell off and lights off).
+
+[true*][a_setBarrier(UNSAFE,CLOSED)]<true*.a_setLight(SAFE,OFF)>true
